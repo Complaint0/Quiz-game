@@ -13,7 +13,7 @@ public class GameScript : MonoBehaviour
     public GameObject headPanel;
     public Button[] answerBttns = new Button[4];
 
-    public Sprite TOFicons;
+    public Sprite[] TFicons = new Sprite[2];
     public Image TFicon;
     public Text TFtext;
 
@@ -67,24 +67,29 @@ public class GameScript : MonoBehaviour
 //     for (int i=0; i < answerBttns.Length;i++) answerBttns[i].interactable = true;
 //     yield break;
 // } 
-    // IEnumerable TrueOrFalse(bool check)
-    // {
-    //     for (int i=0; i < answerBttns.Length;i++) answerBttns[i].interactable = false;
-    //     yield return new WaitForSeconds(1);
+    IEnumerator TrueOrFalse(bool check)
+    {
+        for (int i=0; i < answerBttns.Length;i++) answerBttns[i].interactable = false;
+        yield return new WaitForSeconds(1);
         
-    //     if (check)
-    //     {
+         if (!TFicon.gameObject.activeSelf) TFicon.gameObject.SetActive(true);
+             else TFicon.gameObject.GetComponent<Animator>().SetTrigger("In");
 
-    //     }
-    //     else 
-    //     {
-
-    //     }
-    // }
+        if (check)
+        {
+            TFicon.sprite = TFicons[0];
+            TFtext.text= "Правильный ответ";
+        }
+        else 
+        {
+            TFicon.sprite = TFicons[1];
+            TFtext.text= "Неправильный ответ";
+        }
+    }
 public void AnswerButtons(int index)
     {
-       //if (AnswerQuestion[index].text.ToString() == currentQuestion.answers[0]) StartCoroutine(TrueOrFalse(true));
-       //else StartCoroutine(TrueOrFalse(false));
+       if (AnswerQuestion[index].text.ToString() == currentQuestion.answers[0]) StartCoroutine(TrueOrFalse(true));
+       else StartCoroutine(TrueOrFalse(false));
        qList.RemoveAt(RandQuestion);
        questionGenerate();
     }
