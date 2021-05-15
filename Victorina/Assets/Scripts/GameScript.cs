@@ -13,6 +13,8 @@ public class GameScript : MonoBehaviour
     public GameObject headPanel;
     public Button[] answerBttns = new Button[4];
 
+    public Button PlayGame;
+
     public Sprite[] TFicons = new Sprite[2];
     public Image TFicon;
     public Text TFtext;
@@ -23,6 +25,8 @@ public class GameScript : MonoBehaviour
 
     public void OnClickPlay()
     {
+        if (!PlayGame.GetComponent<Animator>().enabled) PlayGame.GetComponent<Animator>().enabled=true;
+         else PlayGame.GetComponent<Animator>().SetTrigger("In");
         qList = new List<object>(questions);
         questionGenerate();
         if (!headPanel.GetComponent<Animator>().enabled) headPanel.GetComponent<Animator>().enabled=true;
@@ -43,7 +47,7 @@ public class GameScript : MonoBehaviour
                 AnswerQuestion[i].text = answers[rand];
                 answers.RemoveAt(rand);
             }
-                   //StartCoroutine(AnimationButtons());
+                   StartCoroutine(AnimationButtons());
         }
         else 
         {
@@ -51,27 +55,31 @@ public class GameScript : MonoBehaviour
         }
     }
 
-//      IEnumerator AnimationButtons()
-// {
-//     yield return new WaitForSeconds(1);
-//     for (int i=0; i < answerBttns.Length;i++) answerBttns[i].interactable = false;
-//     int a=0;
-//     while (a < answerBttns.Length)
-//     {
-//         if (!answerBttns[a].gameObject.activeSelf) answerBttns[a].gameObject.SetActive(true);
-//         else answerBttns[a].gameObject.GetComponent<Animator>().SetTrigger("In");
-//         a++;
-//         yield return new WaitForSeconds(1);
-//     }
-
-//     for (int i=0; i < answerBttns.Length;i++) answerBttns[i].interactable = true;
-//     yield break;
-// } 
+     IEnumerator AnimationButtons()
+{
+    yield return new WaitForSeconds(1);
+    for (int i=0; i < answerBttns.Length;i++) answerBttns[i].interactable = false;
+    int a=0;
+    while (a < answerBttns.Length)
+    {
+        if (!answerBttns[a].gameObject.activeSelf) answerBttns[a].gameObject.SetActive(true);
+        else answerBttns[a].gameObject.GetComponent<Animator>().SetTrigger("In");
+        a++;
+        yield return new WaitForSeconds(1);
+    }
+    for (int i=0; i < answerBttns.Length;i++) answerBttns[i].interactable = true;
+    yield break;
+} 
     IEnumerator TrueOrFalse(bool check)
     {
         for (int i=0; i < answerBttns.Length;i++) answerBttns[i].interactable = false;
         yield return new WaitForSeconds(1);
-        
+
+        if (!TextQuestion.GetComponent<Animator>().enabled) TextQuestion.GetComponent<Animator>().enabled=true;
+        else TextQuestion.GetComponent<Animator>().SetTrigger("Out");
+
+        yield return new WaitForSeconds(0.5f);
+
          if (!TFicon.gameObject.activeSelf) TFicon.gameObject.SetActive(true);
              else TFicon.gameObject.GetComponent<Animator>().SetTrigger("In");
 
@@ -90,8 +98,8 @@ public void AnswerButtons(int index)
     {
        if (AnswerQuestion[index].text.ToString() == currentQuestion.answers[0]) StartCoroutine(TrueOrFalse(true));
        else StartCoroutine(TrueOrFalse(false));
-       qList.RemoveAt(RandQuestion);
-       questionGenerate();
+    //    qList.RemoveAt(RandQuestion);
+    //    questionGenerate();
     }
 }
 
