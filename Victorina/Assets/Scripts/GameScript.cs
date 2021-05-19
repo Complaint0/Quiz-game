@@ -25,12 +25,16 @@ public class GameScript : MonoBehaviour
 
     public void OnClickPlay()
     {
-        if (!PlayGame.GetComponent<Animator>().enabled) PlayGame.GetComponent<Animator>().enabled=true;
+        if (!PlayGame.GetComponent<Animator>().enabled) 
+        {
+            PlayGame.GetComponent<Animator>().enabled=true;
+            PlayGame.interactable = false;
+        }
          else PlayGame.GetComponent<Animator>().SetTrigger("In");
         qList = new List<object>(questions);
         questionGenerate();
-        if (!headPanel.GetComponent<Animator>().enabled) headPanel.GetComponent<Animator>().enabled=true;
-        else headPanel.GetComponent<Animator>().SetTrigger("In");
+        if (!TextQuestion.GetComponent<Animator>().enabled) TextQuestion.GetComponent<Animator>().enabled=true;
+        else TextQuestion.GetComponent<Animator>().SetTrigger("In");
     }
 
     void questionGenerate()
@@ -39,7 +43,8 @@ public class GameScript : MonoBehaviour
         {
         RandQuestion = Random.Range(0,qList.Count);
         currentQuestion = qList[RandQuestion] as QuestiongList;
-        TextQuestion.text = currentQuestion.question;
+        TextQuestion.text = currentQuestion.question;   
+        TextQuestion.GetComponent<Animator>().SetTrigger("In");
         List <string> answers = new List<string>(currentQuestion.answers);
             for (int i=0; i < currentQuestion.answers.Length; i++)
             {
@@ -73,33 +78,41 @@ public class GameScript : MonoBehaviour
     IEnumerator TrueOrFalse(bool check)
     {
         for (int i=0; i < answerBttns.Length;i++) answerBttns[i].interactable = false;
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.5f);
 
         if (!TextQuestion.GetComponent<Animator>().enabled) TextQuestion.GetComponent<Animator>().enabled=true;
         else TextQuestion.GetComponent<Animator>().SetTrigger("Out");
-
-        yield return new WaitForSeconds(0.5f);
+        for (int i=0; i<answerBttns.Length;i++) answerBttns[i].gameObject.GetComponent<Animator>().SetTrigger("Out");
+        yield return new WaitForSeconds(1.5f);
 
          if (!TFicon.gameObject.activeSelf) TFicon.gameObject.SetActive(true);
              else TFicon.gameObject.GetComponent<Animator>().SetTrigger("In");
+
 
         if (check)
         {
             TFicon.sprite = TFicons[0];
             TFtext.text= "Правильный ответ";
+            yield return new WaitForSeconds(1);
+            TFicon.gameObject.GetComponent<Animator>().SetTrigger("Out");
+            qList.RemoveAt(RandQuestion);
+            questionGenerate();
+            yield break;
         }
         else 
         {
             TFicon.sprite = TFicons[1];
             TFtext.text= "Неправильный ответ";
+            yield return new WaitForSeconds(1);
+            TFicon.gameObject.GetComponent<Animator>().SetTrigger("Out");
+            PlayGame.interactable = true;
+            PlayGame.GetComponent<Animator>().SetTrigger("Out");
         }
     }
 public void AnswerButtons(int index)
     {
        if (AnswerQuestion[index].text.ToString() == currentQuestion.answers[0]) StartCoroutine(TrueOrFalse(true));
        else StartCoroutine(TrueOrFalse(false));
-    //    qList.RemoveAt(RandQuestion);
-    //    questionGenerate();
     }
 }
 
