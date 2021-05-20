@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GameScript : MonoBehaviour
 {
-    public Text TextQuestion;
+    public Image ImageQuestion;
 
     public Text[] AnswerQuestion;
     public QuestiongList[] questions;
@@ -33,8 +33,8 @@ public class GameScript : MonoBehaviour
          else PlayGame.GetComponent<Animator>().SetTrigger("In");
         qList = new List<object>(questions);
         questionGenerate();
-        if (!TextQuestion.GetComponent<Animator>().enabled) TextQuestion.GetComponent<Animator>().enabled=true;
-        else TextQuestion.GetComponent<Animator>().SetTrigger("In");
+        if (!ImageQuestion.GetComponent<Animator>().enabled) ImageQuestion.GetComponent<Animator>().enabled=true;
+        else ImageQuestion.GetComponent<Animator>().SetTrigger("In");
     }
 
     void questionGenerate()
@@ -43,8 +43,8 @@ public class GameScript : MonoBehaviour
         {
         RandQuestion = Random.Range(0,qList.Count);
         currentQuestion = qList[RandQuestion] as QuestiongList;
-        TextQuestion.text = currentQuestion.question;   
-        TextQuestion.GetComponent<Animator>().SetTrigger("In");
+        ImageQuestion.sprite = currentQuestion.question; 
+        ImageQuestion.GetComponent<Animator>().SetTrigger("In");
         List <string> answers = new List<string>(currentQuestion.answers);
             for (int i=0; i < currentQuestion.answers.Length; i++)
             {
@@ -92,8 +92,8 @@ IEnumerator RestartGame()
         for (int i=0; i < answerBttns.Length;i++) answerBttns[i].interactable = false;
         yield return new WaitForSeconds(0.5f);
 
-        if (!TextQuestion.GetComponent<Animator>().enabled) TextQuestion.GetComponent<Animator>().enabled=true;
-        else TextQuestion.GetComponent<Animator>().SetTrigger("Out");
+        if (!ImageQuestion.GetComponent<Animator>().enabled) ImageQuestion.GetComponent<Animator>().enabled=true;
+        else ImageQuestion.GetComponent<Animator>().SetTrigger("Out");
         for (int i=0; i<answerBttns.Length;i++) answerBttns[i].gameObject.GetComponent<Animator>().SetTrigger("Out");
         yield return new WaitForSeconds(1.5f);
 
@@ -131,6 +131,6 @@ public void AnswerButtons(int index)
 [System.Serializable]
 public class QuestiongList
 {
-    public string question;
+    public Sprite question;
     public string[] answers = new string[4];
 }
