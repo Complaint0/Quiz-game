@@ -10,7 +10,7 @@ public class GameScript : MonoBehaviour
     public Text[] AnswerQuestion;
     public QuestiongList[] questions;
     QuestiongList currentQuestion;
-    public GameObject headPanel;
+    public Text EndGame;
     public Button[] answerBttns = new Button[4];
 
     public Button PlayGame;
@@ -56,10 +56,22 @@ public class GameScript : MonoBehaviour
         }
         else 
         {
-            print("Game over");
+            StartCoroutine(RestartGame());
         }
     }
 
+IEnumerator RestartGame()
+{
+    yield return new WaitForSeconds(0.7f);
+    if (!EndGame.GetComponent<Animator>().enabled) EndGame.GetComponent<Animator>().enabled=true;
+    else EndGame.GetComponent<Animator>().SetTrigger("In");
+    yield return new WaitForSeconds(1.5f);
+    EndGame.GetComponent<Animator>().SetTrigger("Out");
+    yield return new WaitForSeconds(1);
+    PlayGame.interactable = true;
+    PlayGame.GetComponent<Animator>().SetTrigger("Out");
+    yield break;
+}
      IEnumerator AnimationButtons()
 {
     yield return new WaitForSeconds(1);
