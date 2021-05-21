@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class GameScript : MonoBehaviour
 {
+    public int Score=0;
+    public Text ScoreText;
     public Image ImageQuestion;
 
     public Text[] AnswerQuestion;
@@ -14,31 +16,63 @@ public class GameScript : MonoBehaviour
     public Button[] answerBttns = new Button[4];
 
     public Button PlayGame;
+    public Button Back;
 
     public Sprite[] TFicons = new Sprite[2];
     public Image TFicon;
     public Text TFtext;
 
+    public AudioSource myFx;
+    public AudioClip TrueAudio;
+    public AudioClip FalseAudio;
+
     List <object> qList;
     
     int RandQuestion;
 
+
+public void MouseUpAsButton()
+{
+    StartCoroutine(BackMenu());
+}
+IEnumerator BackMenu()
+{
+    ImageQuestion.GetComponent<Animator>().SetTrigger("Out");
+    Back.interactable=false;
+    //Back.GetComponent<Animator>().SetTrigger("Out");
+    for (int i=0; i<answerBttns.Length;i++) answerBttns[i].gameObject.GetComponent<Animator>().SetTrigger("Out");
+    ScoreText.GetComponent<Animator>().SetTrigger("Out");
+    yield return new WaitForSeconds(1.5f);
+    PlayGame.interactable = true;
+     PlayGame.GetComponent<Animator>().SetTrigger("Out");
+    yield break;
+}
     public void OnClickPlay()
     {
+           Score=0;   
+           ScoreText.text = Score.ToString();
         if (!PlayGame.GetComponent<Animator>().enabled) 
         {
             PlayGame.GetComponent<Animator>().enabled=true;
             PlayGame.interactable = false;
         }
          else PlayGame.GetComponent<Animator>().SetTrigger("In");
+
+         if (!Back.GetComponent<Animator>().enabled) 
+            Back.GetComponent<Animator>().enabled=true;
+             else Back.GetComponent<Animator>().SetTrigger("In");
+
         qList = new List<object>(questions);
         questionGenerate();
         if (!ImageQuestion.GetComponent<Animator>().enabled) ImageQuestion.GetComponent<Animator>().enabled=true;
         else ImageQuestion.GetComponent<Animator>().SetTrigger("In");
+         if (!ScoreText.GetComponent<Animator>().enabled) ScoreText.GetComponent<Animator>().enabled=true;
+        else ScoreText.GetComponent<Animator>().SetTrigger("In");
     }
 
     void questionGenerate()
     {
+        Back.GetComponent<Button>().interactable = false;
         if (qList.Count > 0)
         {
         RandQuestion = Random.Range(0,qList.Count);
@@ -62,6 +96,7 @@ public class GameScript : MonoBehaviour
 
 IEnumerator RestartGame()
 {
+    ScoreText.gameObject.GetComponent<Animator>().SetTrigger("Out");
     yield return new WaitForSeconds(0.7f);
     if (!EndGame.GetComponent<Animator>().enabled) EndGame.GetComponent<Animator>().enabled=true;
     else EndGame.GetComponent<Animator>().SetTrigger("In");
@@ -70,6 +105,8 @@ IEnumerator RestartGame()
     yield return new WaitForSeconds(1);
     PlayGame.interactable = true;
     PlayGame.GetComponent<Animator>().SetTrigger("Out");
+    // Score =0;
+    // ScoreText.text = Score.ToString();
     yield break;
 }
      IEnumerator AnimationButtons()
@@ -85,10 +122,12 @@ IEnumerator RestartGame()
         yield return new WaitForSeconds(1);
     }
     for (int i=0; i < answerBttns.Length;i++) answerBttns[i].interactable = true;
+    Back.interactable = true;
     yield break;
 } 
     IEnumerator TrueOrFalse(bool check)
     {
+        Back.interactable=false;
         for (int i=0; i < answerBttns.Length;i++) answerBttns[i].interactable = false;
         yield return new WaitForSeconds(0.5f);
 
@@ -103,9 +142,12 @@ IEnumerator RestartGame()
 
         if (check)
         {
+            PlayTrueSound();
             TFicon.sprite = TFicons[0];
             TFtext.text= "Правильный ответ";
             yield return new WaitForSeconds(1);
+            Score+=10;
+            ScoreText.text=Score.ToString();
             TFicon.gameObject.GetComponent<Animator>().SetTrigger("Out");
             qList.RemoveAt(RandQuestion);
             questionGenerate();
@@ -113,10 +155,14 @@ IEnumerator RestartGame()
         }
         else 
         {
+
+            PlayFalseSound();
             TFicon.sprite = TFicons[1];
             TFtext.text= "Неправильный ответ";
+            ScoreText.GetComponent<Animator>().SetTrigger("Out");
             yield return new WaitForSeconds(1);
             TFicon.gameObject.GetComponent<Animator>().SetTrigger("Out");
+            Back.GetComponent<Animator>().SetTrigger("Out");
             PlayGame.interactable = true;
             PlayGame.GetComponent<Animator>().SetTrigger("Out");
         }
@@ -126,7 +172,18 @@ public void AnswerButtons(int index)
        if (AnswerQuestion[index].text.ToString() == currentQuestion.answers[0]) StartCoroutine(TrueOrFalse(true));
        else StartCoroutine(TrueOrFalse(false));
     }
+
+public void PlayTrueSound()
+{
+    myFx.PlayOneShot(TrueAudio);
 }
+public void PlayFalseSound()
+{
+    myFx.PlayOneShot(FalseAudio);
+}
+
+}
+
 
 [System.Serializable]
 public class QuestiongList
